@@ -337,6 +337,35 @@ impl Object {
         }
     }
 
+    /// Obtains reads the object specified name in the specified bucket.
+    /// ### Example
+    /// ```no_run
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use cloud_storage::Object;
+    ///
+    /// let object = Object::read("my_bucket", "path/to/my/file.png")?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn read_object(
+        bucket: &str,
+        file_name: &str,
+    ) -> Result<reqwest::blocking::Response, Error> {
+        let url = format!(
+            "{}/b/{}/o/{}?alt=media",
+            crate::BASE_URL,
+            percent_encode(bucket),
+            percent_encode(file_name),
+        );
+        let client = reqwest::blocking::Client::new();
+        let result = client.get(&url).headers(crate::get_headers()?).send()?;
+        if result.status().is_success() {
+            Ok(result)
+        } else {
+            Err(Error::new(&result.text()?))
+        }
+    }
+
     /// Obtains a single object with the specified name in the specified bucket.
     /// ### Example
     /// ```no_run
