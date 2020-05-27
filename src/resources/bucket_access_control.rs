@@ -110,18 +110,18 @@ impl BucketAccessControl {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn create(
+    pub async fn create(
         bucket: &str,
         new_bucket_access_control: &NewBucketAccessControl,
     ) -> Result<Self, crate::Error> {
         let url = format!("{}/b/{}/acl", crate::BASE_URL, bucket);
-        let client = reqwest::blocking::Client::new();
+        let client = reqwest::Client::new();
         let result: GoogleResponse<Self> = client
             .post(&url)
-            .headers(crate::get_headers()?)
+            .headers(crate::get_headers().await?)
             .json(new_bucket_access_control)
-            .send()?
-            .json()?;
+            .send().await?
+            .json().await?;
         match result {
             GoogleResponse::Success(s) => Ok(s),
             GoogleResponse::Error(e) => Err(e.into()),
@@ -143,14 +143,14 @@ impl BucketAccessControl {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn list(bucket: &str) -> Result<Vec<Self>, crate::Error> {
+    pub async fn list(bucket: &str) -> Result<Vec<Self>, crate::Error> {
         let url = format!("{}/b/{}/acl", crate::BASE_URL, bucket);
-        let client = reqwest::blocking::Client::new();
+        let client = reqwest::Client::new();
         let result: GoogleResponse<ListResponse<Self>> = client
             .get(&url)
-            .headers(crate::get_headers()?)
-            .send()?
-            .json()?;
+            .headers(crate::get_headers().await?)
+            .send().await?
+            .json().await?;
         match result {
             GoogleResponse::Success(s) => Ok(s.items),
             GoogleResponse::Error(e) => Err(e.into()),
@@ -172,14 +172,14 @@ impl BucketAccessControl {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn read(bucket: &str, entity: &Entity) -> Result<Self, crate::Error> {
+    pub async fn read(bucket: &str, entity: &Entity) -> Result<Self, crate::Error> {
         let url = format!("{}/b/{}/acl/{}", crate::BASE_URL, bucket, entity);
-        let client = reqwest::blocking::Client::new();
+        let client = reqwest::Client::new();
         let result: GoogleResponse<Self> = client
             .get(&url)
-            .headers(crate::get_headers()?)
-            .send()?
-            .json()?;
+            .headers(crate::get_headers().await?)
+            .send().await?
+            .json().await?;
         match result {
             GoogleResponse::Success(s) => Ok(s),
             GoogleResponse::Error(e) => Err(e.into()),
@@ -202,15 +202,15 @@ impl BucketAccessControl {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn update(&self) -> Result<Self, crate::Error> {
+    pub async fn update(&self) -> Result<Self, crate::Error> {
         let url = format!("{}/b/{}/acl/{}", crate::BASE_URL, self.bucket, self.entity);
-        let client = reqwest::blocking::Client::new();
+        let client = reqwest::Client::new();
         let result: GoogleResponse<Self> = client
             .put(&url)
-            .headers(crate::get_headers()?)
+            .headers(crate::get_headers().await?)
             .json(self)
-            .send()?
-            .json()?;
+            .send().await?
+            .json().await?;
         match result {
             GoogleResponse::Success(s) => Ok(s),
             GoogleResponse::Error(e) => Err(e.into()),
@@ -233,10 +233,10 @@ impl BucketAccessControl {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn delete(self) -> Result<(), crate::Error> {
+    pub async fn delete(self) -> Result<(), crate::Error> {
         let url = format!("{}/b/{}/acl/{}", crate::BASE_URL, self.bucket, self.entity);
-        let client = reqwest::blocking::Client::new();
-        let response = client.delete(&url).headers(crate::get_headers()?).send()?;
+        let client = reqwest::Client::new();
+        let response = client.delete(&url).headers(crate::get_headers().await?).send().await?;
         if response.status().is_success() {
             Ok(())
         } else {
@@ -244,7 +244,7 @@ impl BucketAccessControl {
         }
     }
 }
-
+/*
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -305,3 +305,4 @@ mod tests {
         Ok(())
     }
 }
+*/
